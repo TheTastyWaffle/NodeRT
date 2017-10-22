@@ -12,17 +12,17 @@ const server = http.createServer(app);
 //const io = socketIO.listen(server);
 const io = socketIO(server);
 
-let clients = [];
+let clients = {};
 
 io.on("connection", socket => {
     handleClientConnection(socket);
-    socket.on("disconnect", () => handleClientDisconnection(socket));
+    socket.on("disconnect", () => handleClientDisconnection(socket.id));
 });
 
 const handleClientConnection = socket => {
     try {
         console.log("Client connected");
-        clients.push(socket);
+        clients[socket.id] = {socket: socket};
         socket.emit("message", "Hello!");
     }
     catch (error) {
@@ -30,11 +30,10 @@ const handleClientConnection = socket => {
     }
 };
 
-const handleClientDisconnection = socket => {
+const handleClientDisconnection = id => {
     try {
         console.log("Client disconnected");
-        socket.emit("message", "Goodbye!");
-        clients.delete(socket);
+        delete clients[id];
     }
     catch (error) {
         console.error(`Error: ${error.code}`);
@@ -54,9 +53,11 @@ server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
 
 setInterval(
     () => {
-        clients.forEach(client => {
+        /*clients.forEach(client => {
             doStuff(client);
-        })
+        });*/
+        io.sockets.emit("message", "refresh")
+        console.log("refresh");
     },
-    10000
+    5000
 );
