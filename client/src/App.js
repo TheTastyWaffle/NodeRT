@@ -28,14 +28,14 @@ class App extends Component {
                     {
                         clients ?
                         <p> Number of clients connected: {clients}</p> :
-                        <p> Scanning *bleep* *bloop*</p>
+                        <p> Scanning clients *bleep* *bloop*</p>
                     }
                 </div>
                 <div style={{textAlign: "center"}}>
                     {
                         message ?
                             <p> Message: {message}</p> :
-                            <p> No message :( </p>
+                            <p> No message </p>
                     }
                 </div>
             </div>
