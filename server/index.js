@@ -12,6 +12,8 @@ const server = http.createServer(app);
 //const io = socketIO.listen(server);
 const io = socketIO(server);
 
+const redis = require('redis');
+
 let clients = {};
 
 io.on("connection", socket => {
