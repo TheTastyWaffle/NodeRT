@@ -18,24 +18,24 @@ let clients = {};
 
 io.on("connection", socket => {
     handleClientConnection(socket);
-    socket.on("disconnect", () => handleClientDisconnection(socket.id));
+    socket.on("disconnect", () => handleClientDisconnection(socket));
 });
 
 const handleClientConnection = socket => {
     try {
         console.log("Client connected");
-        clients[socket.id] = {socket: socket};
-        socket.emit("message", "Hello!");
+        clients[socket.id] = socket;
+        socket.emit("id", socket.id);
     }
     catch (error) {
         console.error(`Error: ${error.code}`);
     }
 };
 
-const handleClientDisconnection = id => {
+const handleClientDisconnection = socket => {
     try {
         console.log("Client disconnected");
-        delete clients[id];
+        delete clients[socket.id];
     }
     catch (error) {
         console.error(`Error: ${error.code}`);
@@ -44,22 +44,36 @@ const handleClientDisconnection = id => {
 
 const doStuff = socket => {
     try {
-        socket.emit("clients", clients.count());
+        socket.emit("clients", Object.keys(clients).length);
     }
     catch (error) {
         console.error(`Error: ${error.code}`);
     }
 };
 
+function Cycle(clients, ...functions) {
+    for (let id in clients) {
+        if (clients.hasOwnProperty(id)) {
+            for (let f in functions) {
+                f(clients[id]);
+            }
+        }
+    }
+}
+
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+
+let cycles = 0;
 
 setInterval(
     () => {
-        /*clients.forEach(client => {
-            doStuff(client);
-        });*/
-        io.sockets.emit("message", "refresh")
-        console.log("refresh");
+        cycles++;
+        for (let id in clients) {
+            if (clients.hasOwnProperty(id)) {
+                doStuff(clients[id]);
+            }
+        }
+        io.sockets.emit("message", "refresh n°" + cycles);
     },
-    5000
+    1000
 );

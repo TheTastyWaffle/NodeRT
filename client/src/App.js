@@ -7,6 +7,7 @@ class App extends Component {
         super();
         this.state = {
             response: false,
+            id: false,
             clients: false,
             endpoint: "http://localhost:3001"
         };
@@ -16,25 +17,34 @@ class App extends Component {
         const {endpoint} = this.state;
         const socket = socketIOClient(endpoint);
         socket.on("message", data => this.setState({message: data}));
-        socket.on("clients", data => this.setState({clients: data}))
+        socket.on("clients", data => this.setState({clients: data}));
+        socket.on("id", data => this.setState({id: data}));
     }
 
     render() {
-        const {message} = this.state;
-        const {clients} = this.state;
+        const {message, id, clients} = this.state;
         return (
             <div>
                 <div style={{textAlign: "center"}}>
                     {
+
+                        id ?
+                            <p> You are client: {id} </p> :
+                            <p> Getting client id </p>
+                    }
+                </div>
+                <div style={{textAlign: "center"}}>
+                    {
+
                         clients ?
-                        <p> Number of clients connected: {clients}</p> :
-                        <p> Scanning clients *bleep* *bloop*</p>
+                            <p> Number of clients connected: {clients} </p> :
+                            <p> Scanning clients </p>
                     }
                 </div>
                 <div style={{textAlign: "center"}}>
                     {
                         message ?
-                            <p> Message: {message}</p> :
+                            <p> Message: {message} </p> :
                             <p> No message </p>
                     }
                 </div>
